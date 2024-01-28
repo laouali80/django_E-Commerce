@@ -1,0 +1,34 @@
+body {
+    padding: 10px;
+}
+
+
+#pic {
+    width: 250px;
+    height: 250px;
+}
+
+
+#listing-link {
+    text-decoration: none;
+    color: black;
+}
+
+#listing-link:hover {
+    text-decoration: none;
+}
+
+#listing-pic {
+    /* max-height: 250px; */
+    /* max-width: 400px; */
+}
+
+
+#comments {
+    margin:5px;
+    padding:5px;
+    /* width: 130%; */
+    height: 110px;
+    overflow: auto;
+    text-align:justify;
+}

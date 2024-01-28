@@ -1,0 +1,49 @@
+{% extends "auctions/layout.html" %}
+{% load static %}
+{% load my_filter %}
+
+{% block body %}
+
+    <h2>My Active Listings</h2>
+    <div class="container">
+        <div class="row">
+        {% for auction in auctions %}
+                <div class="col">
+                <div class="card mb-2" style="width: 18rem;">
+                    {% if auction.img_url %}
+                        <img src="{{ auction.img_url }}" class="card-img-top" alt="{{ auction.title }}" style="max-height:214px; height:214px">
+                    {% else %}
+                        <img src="{% static 'default/default.jpg' %}" class="card-img-top" alt="{{ auction.title }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ auction.title | capfirst }}</h5>
+                        <p class="card-text">{{ auction.description | capfirst }}</p>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>Initial Price:</strong> {{ auction.price | usd }}</li>
+
+                        {% if auction.category %}
+                            <li class="list-group-item"><strong>Category:</strong> {{ auction.category }}</li>
+                        {% else %}
+                            <li class="list-group-item"><strong>Category:</strong> None</li>
+                        {% endif %}
+
+                        {% if auction.status %}
+                            <li class="list-group-item"><strong>Status:</strong> <span class="text-success">Active</span></li>
+                        {% else %}
+                            <li class="list-group-item"><strong>Status:</strong> <span class="text-danger">Close</span></li>
+                        {% endif %}
+                    </ul>
+                    <div class="card-body">
+                        <a href="{% url 'listing' auction.id %}" class="btn btn-primary">Info</a>
+                    </div>
+                    </div>
+                </div>
+        {% empty %}
+            <h4>No Active Listing</h4>
+        {% endfor %}
+
+        </div>
+    </div>
+
+{% endblock %}

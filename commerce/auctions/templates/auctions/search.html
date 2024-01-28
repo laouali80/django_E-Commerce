@@ -1,0 +1,66 @@
+{% extends "auctions/layout.html" %}
+{% load static %}
+{% load my_filter %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{% block body %}
+
+
+      <nav class="navbar navbar-light bg-light mb-2">
+        <h2 class="navbar-brand">Active Listings</h2>
+        <form class="form-inline" action="{% url 'search' %}" method="GET">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="category">Search by Category: </label>
+                <select id="category" name="category" class="form-control ml-sm-2 mr-sm-2">
+                    <option value="all">All</option>
+                    {% for category in categories %}
+                    <option value="{{ category.id }}">{{ category }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>
+      </nav>
+    {% for listing in listings %}
+        <a id="listing-link" href="{% url 'listing' listing.id %}">
+
+            <div class="d-flex p-2 mb-3 bd-highlight border rounded-lg">
+                {% if listing.img_url %}
+                    <div>
+                        <img id="pic" src="{{ listing.img_url }}">
+                    </div>
+                {% else %}
+                    <div>
+                        <img id="pic" src="{% static 'default/default.jpg' %}">
+                    </div>
+                {% endif %}
+                <div id="info" class="ml-4 mt-2">
+                    <div id="item-name" class="mb-2">
+                        <strong>{{ listing.title | capfirst }}</strong>
+                    </div>
+                    <div id="item-price" class="mb-2">
+                        <strong>Price: {{ listing.price |usd }}</strong>
+                    </div>
+                    <div id="description" class="mb-2">
+                        <strong>{{ listing.description | capfirst }}</strong>
+                    </div>
+                    <div id="date">
+                        <span class="text-secondary">
+                            <!-- .strftime("%b. %d, %Y, %I:%M %p") -->
+                            Created {{ listing.date }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </a>
+
+        {% empty %}
+        <h1>No Item of this category</h1>
+    {% endfor %}
+
+
+{% endblock %}

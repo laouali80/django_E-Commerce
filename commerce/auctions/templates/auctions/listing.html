@@ -1,0 +1,178 @@
+{% extends "auctions/layout.html" %}
+{% load static %}
+{% load my_filter %}
+
+
+{% block body %}
+
+        <div class="d-flex flex-column bd-highlight mb-3">
+            </div>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                        <strong>{{ message.tags | capfirst }}!</strong> {{message}}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <div>
+            <div>
+                <h1>Listing: {{ listing.title | capfirst}}</h1>
+            </div>
+            <div id="watchlist">
+                <form action="{% url 'watchlist' listing_id=listing.id %}" method="post">
+                    {% csrf_token %}
+
+                    {% if watchlist %}
+                        <button type="submit" class="btn btn-outline-secondary btn-sm mb-2 p-1">
+                            <strong>
+                                Remove from Watchlist
+                            </strong>
+                        </button>
+                        <input type="hidden" value="remove" name="action">
+                    {% else %}
+                        <button type="submit" class="btn btn-outline-primary btn-sm mb-2 p-1">
+                            <strong>
+                                Add to Watchlist
+                            </strong>
+                        </button>
+                        <input type="hidden" value="add" name="action">
+                    {% endif %}
+                </form>
+
+            </div>
+            {% if listing.img_url %}
+                <div>
+                    <img id="listing-pic" class="img-fluid" src="{{ listing.img_url }}">
+                </div>
+            {% else %}
+                <div>
+                    <img id="listing-pic" class="img-fluid" src="{% static 'default/default.jpg' %}">
+                </div>
+            {% endif %}
+
+            <div id="description" class="mt-2 mb-2">
+                {{ listing.description | capfirst }}
+            </div>
+
+            <div id="initial_price" class="mt-2 mb-2">
+               Initial Price: <strong>{{ listing.price | usd }}</strong>
+            </div>
+
+            {% if bid %}
+                <div id="latest_bid" class="mb-2 mt-3">
+                    Latest Price: <strong>{{ bid.first.latest_price |usd }}</strong>
+                </div>
+            {% else %}
+                <div>
+                    <ul><li><strong>No bid yet</strong></li></ul>
+                </div>
+            {% endif %}
+
+            {% if listing.owner != request.user and listing.status != False %}
+                <div id="bids-form">
+                    <form action="{% url 'bid' listing_id=listing.id %}" method="post">
+                        {% csrf_token %}
+
+                        <div class="form-group">
+                            <label for="bid">{{ bid.count }} bid(s) so far.</label>
+                            <input name="bid" type="number" class="form-control" placeholder="Bid" autocomplete="off" required min="1">
+                        </div>
+                        <div>
+                            <input type="submit" class="btn btn-primary p-1" value="Place Bid">
+                        </div>
+                    </form>
+                </div>
+            {% endif %}
+                
+                <div id="details" class="mt-2">
+                    <strong>Details</strong>
+                    <ul>
+                        <li>Listed by: <span class="text-primary"> {{ listing.owner | capfirst }}</span></li>
+                        {% if listing.category %}
+                            <li >Category: {{ listing.category | capfirst }}</li>
+                        {% else %}
+                            <li>Category: None</li>
+                        {% endif %}
+                        {% if listing.status %}
+                            <li >Status: <span class="text-success">Active</span></li>
+                        {% else %}
+                            <li>Status: <span class="text-danger">Close</span></li>
+                            {% if bid.first.bidder %}
+                                <li>Winner: <strong>{{ bid.first.bidder | capfirst }}</strong> </li>
+                            {% else %}
+                                <li>Winner: <strong>None</strong> </li>
+                            {% endif %}
+                        {% endif %}
+                        
+                    </ul>
+                </div>
+                <strong>{{comments.count}} Comments</strong>
+                <div id="comments" class="d-flex p-2 mb-3 bd-highlight border rounded-lg">
+                    <div>
+                        <ul class="list-unstyled">
+                            {% for comment in comments %}
+                                <li class="media">
+                                    <div class="media-body">
+                                    <h4 class="mt-0 mb-0 text-secondary">{{ comment.commentator | capfirst }}</h4>
+                                    <h6 class="mt-0 mb-2 text-secondary">{{ comment.date | date:"F d, Y h:i a" }}</h6>
+                                    <p>
+                                        {{ comment.comment }}
+                                    </p>
+                                    </div>
+                                </li>
+                            {% endfor %}
+
+                          </ul>
+                    </div>
+                </div>
+
+                {% if listing.status != False %}
+                    <div id="adding_comment">
+                        <form action="{% url 'comment' listing_id=listing.id %}" method="post">
+                            {% csrf_token %}
+
+                            {% for field in form %}
+                                <div class="form-group">
+
+                                    <strong>{{ field.label_tag}}</strong>
+                                    <br>
+                                    {{ field }}
+
+                                </div>
+                            {% endfor %}
+
+                            <input class="btn btn-outline-primary" type="submit" value="Comment">
+                        </form>
+                    </div>
+                {% endif %}
+
+                {% if request.user == listing.owner %}
+                    <div>
+                        <form action="{% url 'status' listing.id %}" method="post">
+                            {% csrf_token %}
+
+                            {% if listing.status %}
+                                <button type="submit" class="btn btn-danger float-right btn-sm mb-4 ml-2 p-1">
+                                    <strong>
+                                        Close The Auction.
+                                    </strong>
+                                </button>
+                                <input type="hidden" value="close" name="action">
+                            {% else %}
+                                <button type="submit" class="btn btn-success float-right btn-sm mb-4 ml-2 p-1">
+                                    <strong>
+                                        Activate The Auction.
+                                    </strong>
+                                </button>
+                                <input type="hidden" value="activate" name="action">
+                            {% endif %}
+                        </form>
+                    </div>
+                {% endif %}
+        </div>
+
+
+{% endblock %}
