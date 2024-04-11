@@ -15,7 +15,7 @@ from django.utils import timezone
 @login_required(login_url="/login")
 def index(request):
     return render(request, "auctions/index.html", {
-        "listings": Listing.objects.exclude(owner=request.user).filter(status=True).order_by('-date'),
+        "listings": Listing.objects.exclude(owner=request.user).filter(status=True).order_by('-creationDate'),
         "categories": Category.objects.all()
     })
 
@@ -85,6 +85,7 @@ def create_listing(request):
                 title = form.cleaned_data["title"]
                 description = form.cleaned_data["description"]
                 price = form.cleaned_data["price"]
+                endedDate = request.POST.get("endedDate", False)
                 img_url = form.cleaned_data["img_url"]
                 category = request.POST.get("category", False)
 
@@ -96,15 +97,14 @@ def create_listing(request):
 
                 user = User.objects.get(pk=request.user.id)
 
-                # print("hiiiiiiiiiiiiiiiiiiiiiiiiiiii",category)
                
                 # Attempt to add the listing create
                 try:
                     if category:
                         try:
                             if Category.objects.get(pk=int(category)):
-                                item = Listing.objects.create(title=title, description=description, price=price, img_url=img_url, 
-                                                              owner=user, category=Category.objects.get(pk=int(category)))
+                                item = Listing.objects.create(title=title, description=description, price=price, endedDate=endedDate,
+                                                              img_url=img_url, owner=user, category=Category.objects.get(pk=int(category)))
                                 item.save()
                         except IntegrityError and ValueError:
                             return render(request, "auctions/create_listing.html", {
@@ -321,7 +321,7 @@ def my_watchlists(request):
 
 def myActListings(request):
     # getting all the listing of the request user.
-    my_act_listings = Listing.objects.filter(owner=request.user).order_by('-date')
+    my_act_listings = Listing.objects.filter(owner=request.user).order_by('-creationDate')
 
     return render(request, "auctions/my_act_listings.html", {
                     "auctions": my_act_listings,
@@ -399,7 +399,7 @@ def status(request, listing_id):
             elif action == "activate":
                 
                 listing.status=True
-                listing.date=timezone.now()
+                listing.creationDate=timezone.now()
                 listing.save()
                 return redirect("listing", listing_id)
             else:

@@ -39,9 +39,17 @@
                     </div>
                 {% endif %}
                 <div id="info" class="ml-4 mt-2">
-                    <div id="item-name" class="mb-2">
-                        <strong>{{ listing.title | capfirst }}</strong>
+                    <div  class="d-flex bd-highlight justify-content-between">
+                        <div id="item-name" class="mb-2">
+                            <strong>{{ listing.title | capfirst }}</strong>
+                        </div>
+                        <div class="text-center">
+                            Time left: <span id="countdown-box" ><div class="spinner-border spinner-border-sm" role="status"></div></span>
+                            <!-- <div class="spinner-border" role="status"></div> -->
+                        </div>
+                        <!-- <div class="flex-grow-1">1 day 3 hours 23 minutes 03 secondes</div> -->
                     </div>
+                    
                     <div id="item-price" class="mb-2">
                         <strong>Price: {{ listing.price |usd }}</strong>
                     </div>
@@ -49,9 +57,9 @@
                         <strong>{{ listing.description | capfirst }}</strong>
                     </div>
                     <div id="date">
-                        <span class="text-secondary">
+                        <span class="text-secondary" id="ended-date">
                             <!-- .strftime("%b. %d, %Y, %I:%M %p") -->
-                            Created {{ listing.date }}
+                            Terminated on: <span id="end-date">{{ listing.endedDate |date:"M d, Y H:i:s" }}</span>
                         </span>
                     </div>
                 </div>

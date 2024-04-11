@@ -13,7 +13,8 @@ class Listing(models.Model):
     img_url = models.URLField(null=True, blank=True, default=None)
     status = models.BooleanField(default=True)
     owner = models.ForeignKey('User', on_delete=models.CASCADE, related_name='items')
-    date = models.DateTimeField(default=timezone.now)
+    creationDate = models.DateTimeField(default=timezone.now)
+    endedDate = models.DateTimeField()
     watchlist = models.ManyToManyField('User', blank=True, related_name='watchlist')
     category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='categoried', null=True, blank=True)
 
